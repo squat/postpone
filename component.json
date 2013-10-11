@@ -1,0 +1,14 @@
+{
+  "name": "postpone",
+  "repo": "lsvx/postpone",
+  "description": "A polyfill for postponing the loading of media.",
+  "version": "0.1.0",
+  "keywords": ["postpone", "media", "resource", "priority", "download"],
+  "dependencies": {},
+  "development": {},
+  "license": "MIT",
+  "main": "index.js",
+  "scripts": [
+    "index.js"
+  ]
+}
