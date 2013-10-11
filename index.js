@@ -287,9 +287,17 @@ Postpone.prototype.isVisible = function( el, scrollElement ) {
     /** Use clientHeight instead of window.innerHeight for compatability with ie8. */
     var viewPortHeight = document.documentElement.clientHeight,
         top = this.offsetTop( el ),
-        scrollHeight = scrollElement.scrollTop + this.offsetTop( scrollElement );
+        scrollHeight = scrollElement.scrollTop + this.offsetTop( scrollElement ),
+        isHighEnough = false,
+        isLowEnough = false;
 
-    return viewPortHeight + scrollHeight >= top;
+    /** Check if element is above bottom of screen. */
+    isHighEnough = viewPortHeight + scrollHeight >= top;
+
+    /** Check if element is below top of screen. */
+    isLowEnough = el.height + top >= scrollHeight;
+
+    return isHighEnough && isLowEnough;
 };
 
 /**
