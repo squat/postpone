@@ -357,7 +357,7 @@ Postpone.prototype.load = function( el ) {
     }
 
     else if ( ~"audio, video".indexOf( el.tagName.toLowerCase() ) && el.children.length ) {
-        for ( i = 0; i <= el.children.length; i++ ) {
+        for ( i = 0; i < el.children.length; i++ ) {
             child = el.children[ i ];
             if ( child.tagName.toLowerCase() === "source" && child.getAttribute( "data-src" ) ) {
                 child.setAttribute( "src", child.getAttribute( "data-src" ) );
@@ -366,7 +366,7 @@ Postpone.prototype.load = function( el ) {
     }
 
     else if ( el.tagName.toLowerCase() === "picture" && el.children.length ) {
-        for ( i = 0; i <= el.children.length; i++ ) {
+        for ( i = 0; i < el.children.length; i++ ) {
             child = el.children[ i ];
             if ( child.tagName.toLowerCase() === "source" ) {
                 if ( child.getAttribute( "data-src" ) ) {

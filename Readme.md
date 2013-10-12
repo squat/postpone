@@ -9,6 +9,11 @@
 
     $ component install lsvx/postpone
 
+  Install with [bower](http://bower.io/)
+
+    $ bower install postpone
+
+
 ## Usage
 
   To postpone an element, simply specify a `postpone` attribute on it and move the url for the resource you would like to load to a data attribute.
