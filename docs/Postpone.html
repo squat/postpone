@@ -207,7 +207,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">index.js</a>, <a href="index.js.html#line108">line 108</a>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line28">line 28</a>
     </li></ul></dd>
     
     
@@ -309,7 +309,7 @@ elements with respoect to which the postponed elements scroll.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">index.js</a>, <a href="index.js.html#line122">line 122</a>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line33">line 33</a>
     </li></ul></dd>
     
     
@@ -517,7 +517,7 @@ postpone will look for new postponed elements twice a second.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">index.js</a>, <a href="index.js.html#line200">line 200</a>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line213">line 213</a>
     </li></ul></dd>
     
     
@@ -582,7 +582,7 @@ postpone will look for new postponed elements twice a second.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">index.js</a>, <a href="index.js.html#line93">line 93</a>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line104">line 104</a>
     </li></ul></dd>
     
     
@@ -674,7 +674,7 @@ elements scroll. The elements are stored with a unique ID as a their key.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">index.js</a>, <a href="index.js.html#line117">line 117</a>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line133">line 133</a>
     </li></ul></dd>
     
     
@@ -806,7 +806,7 @@ elements are already visible. Then, init will start the watch process.
         
             
 <dt>
-    <h4 class="name" id="isVisible"><span class="type-signature"></span>isVisible<span class="signature">(el, scrollElement)</span><span class="type-signature"> &rarr; {boolean}</span></h4>
+    <h4 class="name" id="isInViewport"><span class="type-signature"></span>isInViewport<span class="signature">(el, scrollElement)</span><span class="type-signature"> &rarr; {boolean}</span></h4>
     
     
 </dt>
@@ -814,7 +814,7 @@ elements are already visible. Then, init will start the watch process.
     
     
     <div class="description">
-        Helper method to determine if an element is visible.
+        Helper method to determine if an element is in the browser's viewport.
     </div>
     
 
@@ -918,7 +918,7 @@ elements are already visible. Then, init will start the watch process.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">index.js</a>, <a href="index.js.html#line282">line 282</a>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line318">line 318</a>
     </li></ul></dd>
     
     
@@ -943,7 +943,149 @@ elements are already visible. Then, init will start the watch process.
     
             
 <div class="param-desc">
-    Return true if the `el` is visible and false if it is not.
+    Return true if the `el` is in view and false if it is not.
+</div>
+
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">boolean</span>
+
+
+	</dd>
+</dl>
+
+        
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <h4 class="name" id="isVisible"><span class="type-signature"></span>isVisible<span class="signature">(el)</span><span class="type-signature"> &rarr; {boolean}</span></h4>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        Small helper method to determine if an element is visually hidden or not.
+This method check if the element provided, or any of its parents have the
+style `display: none;`.
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>el</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">The element we wish to locate.</td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line297">line 297</a>
+    </li></ul></dd>
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    Returns true if the element is visible and false if it is
+hidden.
 </div>
 
 
@@ -1058,7 +1200,7 @@ postponed.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">index.js</a>, <a href="index.js.html#line309">line 309</a>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line345">line 345</a>
     </li></ul></dd>
     
     
@@ -1197,7 +1339,7 @@ postponed.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">index.js</a>, <a href="index.js.html#line264">line 264</a>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line277">line 277</a>
     </li></ul></dd>
     
     
@@ -1290,7 +1432,7 @@ loaded until they become visible.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">index.js</a>, <a href="index.js.html#line57">line 57</a>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line49">line 49</a>
     </li></ul></dd>
     
     
@@ -1418,7 +1560,7 @@ elementes are visible.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">index.js</a>, <a href="index.js.html#line238">line 238</a>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line251">line 251</a>
     </li></ul></dd>
     
     
@@ -1497,7 +1639,7 @@ elementes are visible.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">index.js</a>, <a href="index.js.html#line213">line 213</a>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line226">line 226</a>
     </li></ul></dd>
     
     
@@ -1576,7 +1718,7 @@ elementes are visible.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">index.js</a>, <a href="index.js.html#line226">line 226</a>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line239">line 239</a>
     </li></ul></dd>
     
     
@@ -1704,7 +1846,7 @@ string.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">index.js</a>, <a href="index.js.html#line172">line 172</a>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line184">line 184</a>
     </li></ul></dd>
     
     
@@ -1824,7 +1966,8 @@ string.
             
             
             
-            <td class="description last">A string of postponed elements.</td>
+            <td class="description last">A string of non-visually hidden
+postponed elements.</td>
         </tr>
 	
 	
@@ -1855,7 +1998,7 @@ string.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">index.js</a>, <a href="index.js.html#line187">line 187</a>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line200">line 200</a>
     </li></ul></dd>
     
     
@@ -1912,7 +2055,7 @@ string.
 <br clear="both">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.1</a> on Fri Oct 11 2013 10:09:05 GMT-0400 (EDT)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.1</a> on Sat Oct 12 2013 01:23:55 GMT-0400 (EDT)
 </footer>
 
 <script> prettyPrint(); </script>

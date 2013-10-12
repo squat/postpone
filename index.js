@@ -22,23 +22,15 @@ function Postpone() {
          * will work;
          */
         this.tags = "audio, embed, iframe, img, image, picture, use, video, tref";
-
-        this.getElements();
-        this.getScrollElements();
-
         /**
-         * If any of the postponed elements should be visible to begin with,
-         * then load them.
+         * @property {array} elements - An array of all the postponed elements in the document.
          */
-        for ( var id in this.scrollElements ) {
-            for ( var i = 0, element = {}; i < this.scrollElements[ id ].length; i++ ) {
-                element = this.scrollElements[ id ][ i ];
-                if ( this.isVisible( element, this.scrollElements[ id ].element ) ) {
-                    this.load( element );
-                }
-            }
-        }
-
+        this.elements = [];
+        /**
+        * @property {object} scrollElements - A variable to keep track of the
+        * elements with respoect to which the postponed elements scroll.
+        */
+        this.scrollElements = [];
         this.postpone();
 
         /** Call method to start looking for postponed media. */
@@ -59,7 +51,9 @@ Postpone.prototype.postpone = function() {
 
     /**
      * Remove any previous event handlers so they can be reattached for new
-     * postponed elements without duplicating old ones.
+     * postponed elements without duplicating old ones. This must be done
+     * before updating the scroll elements so the references to the event
+     * callbacks still exist.
      */
     for ( id in this.scrollElements ) {
         if ( id === "window" ) {
@@ -69,11 +63,28 @@ Postpone.prototype.postpone = function() {
         }
     }
 
-    if ( this.elements.length ) {
-        this.getElements();
-        this.getScrollElements();
+    /**
+     * Update the elements and scroll elements to properly load or postpone
+     * them.
+     */
+    this.getElements();
+    this.getScrollElements();
+    
+    /**
+     * If any of the postponed elements should be visible to begin with,
+     * load them.
+     */
+    for ( var id in this.scrollElements ) {
+        for ( var i = 0, element = {}; i < this.scrollElements[ id ].length; i++ ) {
+            element = this.scrollElements[ id ][ i ];
+            if ( this.isInViewport( element, this.scrollElements[ id ].element ) ) {
+                this.load( element );
+            }
+        }
+    }
 
-        /** Attach scroll event listeners. */
+    if ( this.elements.length ) {
+       /** Attach scroll event listeners. */
         for ( id in this.scrollElements ) {
             this.scrollElements[ id ].callback = this.scrollHandler.bind( this );
             if ( id === "window" ) {
@@ -92,6 +103,7 @@ Postpone.prototype.postpone = function() {
  */
 Postpone.prototype.getElements = function() {
     var elements = [],
+        visible = [],
         matches = Array.prototype.slice.call( document.querySelectorAll( this.tags ) ),
         postpone = null;
 
@@ -99,13 +111,17 @@ Postpone.prototype.getElements = function() {
         postpone = matches[ i ].getAttribute( "postpone" );
         if ( typeof postpone === "string" && postpone !== "false" ) {
             elements.push( matches[ i ] );
+            if ( this.isVisible( matches[ i ] ) ) {
+                visible.push( matches[ i ] );
+            }
         }
     }
-
+    this.elements = elements;
     /**
-     * @property {array} elements - An array of all the postponed elements in the document.
+     * @property {array} visible - An array of all the non-hidden postponed
+     * elements in the document.
      */
-    return this.elements = elements;
+    this.elements.visible = visible;
 };
 
 /**
@@ -115,18 +131,14 @@ Postpone.prototype.getElements = function() {
  * IDs of their scroll elements.
  */
 Postpone.prototype.getScrollElements = function() {
-    /**
-     * @property {object} scrollElements - A variable to keep track of the
-     * elements with respoect to which the postponed elements scroll.
-     */
-    this.scrollElements = {};
+   this.scrollElements = {};
 
     var id = "",
         element = {},
         scrollElement = {};
 
-    for ( var i = 0; i < this.elements.length; i++ ) {
-        element = this.elements[ i ];
+    for ( var i = 0; i < this.elements.visible.length; i++ ) {
+        element = this.elements.visible[ i ];
         /**
          * Find the element relative to which the postponed element's
          * position should be calculated.
@@ -160,7 +172,7 @@ Postpone.prototype.getScrollElements = function() {
             this.scrollElements[ id ].element = scrollElement;
         }
     }
-
+    return this.scrollElements;
 };
 
 /**
@@ -181,15 +193,16 @@ Postpone.prototype.stringifyElements = function( elements ) {
 
 /**
  * Method to watch the document for new postponed elements.
- * @param {string} [elementsString] - A string of postponed elements.
+ * @param {string} [elementsString] - A string of non-visually hidden
+ * postponed elements.
  * @returns this
  */
 Postpone.prototype.watch = function( elementsString ) {
     /** Refresh the array of postponed elements, this.elements. */
     this.getElements();
-    var newElementsString = this.stringifyElements( this.elements );
+    var newElementsString = this.stringifyElements( this.elements.visible );
     /** If the postponed elements have changed, then postpone them. */
-    if ( elementsString && elementsString !== newElementsString ) {
+    if ( elementsString !== newElementsString ) {
         this.postpone();
     }
     /**
@@ -248,7 +261,7 @@ Postpone.prototype.scrollHandler = function( e ) {
          * If an element is visible then we no longer need to postpone it
          * and can download it.
          */
-        if ( this.isVisible( element, scrollElement ) ) {
+        if ( this.isInViewport( element, scrollElement ) ) {
            this.load( element );
         }
     }
@@ -274,12 +287,35 @@ Postpone.prototype.offsetTop = function( el ) {
 };
 
 /**
- * Helper method to determine if an element is visible.
+ * Small helper method to determine if an element is visually hidden or not.
+ * This method check if the element provided, or any of its parents have the
+ * style `display: none;`.
+ * @param {object} el - The element we wish to locate.
+ * @returns {boolean} Returns true if the element is visible and false if it is
+ * hidden.
+ */
+Postpone.prototype.isVisible = function( el ) {
+    var temp = el,
+        isVisible = true;
+    /**
+     * Iterate over all parents of el up to HTML to find if el or a parent is
+     * hidden.
+     */
+    while ( temp && temp.parentElement && isVisible ) {
+        isVisible = temp.style.display !== "none";
+        temp = temp.parentElement;
+    }
+
+    return isVisible;
+};
+
+/**
+ * Helper method to determine if an element is in the browser's viewport.
  * @param {object} el - The element we wish to test.
  * @param {object} scrollElement - The element with respect to which `el` scrolls.
- * @returns {boolean} Return true if the `el` is visible and false if it is not.
+ * @returns {boolean} Return true if the `el` is in view and false if it is not.
  */
-Postpone.prototype.isVisible = function( el, scrollElement ) {
+Postpone.prototype.isInViewport = function( el, scrollElement ) {
     /** If no scroll element is specified, then assume the scroll element is the window. */
     scrollElement = scrollElement? scrollElement : "window";
 
