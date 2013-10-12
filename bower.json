@@ -1,0 +1,25 @@
+{
+  "name": "postpone",
+  "main": "index.js",
+  "version": "0.2.0",
+  "homepage": "https://github.com/lsvx/postpone",
+  "authors": [
+    "Lucas Serven <lserven@gmail.com>"
+  ],
+  "description": "A polyfill for postponing the loading of media.",
+  "keywords": [
+    "postpone",
+    "media",
+    "resource",
+    "priority",
+    "download"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
