@@ -331,7 +331,7 @@ Postpone.prototype.isInViewport = function( el, scrollElement ) {
     isHighEnough = viewPortHeight + scrollHeight >= top;
 
     /** Check if element is below top of screen. */
-    isLowEnough = el.height + top >= scrollHeight;
+    isLowEnough = ( el.height || 0 ) + top >= scrollHeight;
 
     return isHighEnough && isLowEnough;
 };
