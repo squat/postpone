@@ -69,7 +69,7 @@ Postpone.prototype.postpone = function() {
      */
     this.getElements();
     this.getScrollElements();
-    
+
     /**
      * If any of the postponed elements should be visible to begin with,
      * load them.

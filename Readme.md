@@ -44,8 +44,11 @@ postpone = new Postpone(); // Creates a new instance and starts watching the doc
 ### .start()
   If you have paused postpone's watcher, you can start it back up with `.start()`.
 
-### .isVisible(element, [scrollElement])
-  Check if your `element` is visible, where `element` and `scrollElement` are DOM nodes. If `scrollElement` is not specified, postpone assumed `element` scrolls with respect to the document.
+#### .isInViewPort(element, [scrollElement])
+  Check if your `element` is somewhere in the browser's viewport, where `element` and `scrollElement` are DOM nodes. If `scrollElement` is not specified, postpone assumed `element` scrolls with respect to the document.
+
+### .isVisible(element)
+  Check if your `element` is visually hidden, where `element` is a DOM node. This method checks if `element` or any parent element is hidden with the CSS style `display: none;`.
 
 ### .load(element)
   Stop postponing the download of your `element` by manually telling postpone to load it.
