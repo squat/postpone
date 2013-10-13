@@ -1,0 +1,27 @@
+{
+  "name": "postpone",
+  "version": "0.3.0",
+  "description": "A polyfill for postponing the loading of media.",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/lsvx/postpone.git"
+  },
+  "keywords": [
+    "postpone",
+    "media",
+    "resource",
+    "priority",
+    "download"
+  ],
+  "author": "Lucas Serven <lserven@gmail.com>",
+  "license": "MIT",
+  "readmeFilename": "Readme.md",
+  "gitHead": "5a370c8a3cb7b1d07db4609b91dbb3d927b555b4",
+  "bugs": {
+    "url": "https://github.com/lsvx/postpone/issues"
+  }
+}
