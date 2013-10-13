@@ -50,7 +50,7 @@ postpone = new Postpone() // Threshold defaults to 0vh
 postpone.setThreshold( "200px" ).postpone() // Change the threshold to 200px.
 ````
 
-*Note:* we chain the `postpone()` method after changing the threshold to make sure postpone reexamines the postponed elements in the document and check if any of them should be loaded.
+*Note:* it is good practice to chain the `postpone()` method after changing the threshold to make sure postpone reexamines the postponed elements in the document and check if any of them should be loaded.
 
   The postpone polyfill works with audio, embed, iframe, img, image, picture, use, video, and tref elements. *Note:* although the specification for `picture` is still evolving, postpone has basic support for it and is fully compatible with the [pictureTime polyfill](https://github.com/chuckcarpenter/picturetime).
 
@@ -71,7 +71,7 @@ postpone.setThreshold( "200px" ).postpone() // Change the threshold to 200px.
 ### .start()
   If you have paused postpone's watcher, you can start it back up with `.start()`.
 
-#### .isInViewPort(element, [scrollElement])
+### .isInViewport(element, [scrollElement])
   Check if your `element` is somewhere in the browser's viewport, where `element` and `scrollElement` are DOM nodes. If `scrollElement` is not specified, postpone assumed `element` scrolls with respect to the document.
 
 ### .isVisible(element)
