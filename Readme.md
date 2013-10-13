@@ -30,6 +30,28 @@ var Postpone = require( "postpone" );
 postpone = new Postpone(); // Creates a new instance and starts watching the document.
 ````
 
+  By default, postpone will load an element's resource when that element scrolls into the viewport, however, you may want postpone to start loading your resources a bit before they scroll into view to ensure that they are available by the time they are on screen. Postpone lets you do this easily by passing a parameter to the constructor. If you feed postpone a number, postpone will assume you are using `vh` units, however you can also feed it a string with explicit units, such as `"150px"` or `"30vh"`. Currently, only `vh` and `px` units are supported.
+
+````js
+var Postpone = require( "postpone" );
+
+postpone = new Postpone( 50 ); // Postpone will set the threshold to 50vh, or half a viewport.
+````
+
+Optionally, you can manually change the threshold at any point in your code by calling the `.setThreshold()` method.
+
+````js
+var Postpone = require( "postpone" );
+
+postpone = new Postpone() // Threshold defaults to 0vh
+
+... // Do something with our code.
+
+postpone.setThreshold( "200px" ).postpone() // Change the threshold to 200px.
+````
+
+*Note:* we chain the `postpone()` method after changing the threshold to make sure postpone reexamines the postponed elements in the document and check if any of them should be loaded.
+
   The postpone polyfill works with audio, embed, iframe, img, image, picture, use, video, and tref elements. *Note:* although the specification for `picture` is still evolving, postpone has basic support for it and is fully compatible with the [pictureTime polyfill](https://github.com/chuckcarpenter/picturetime).
 
   Postpone works by modyfing the `src` and `xlink:href` attributes of elements and their descendant `source` elements when they become visible.
@@ -57,6 +79,9 @@ postpone = new Postpone(); // Creates a new instance and starts watching the doc
 
 ### .load(element)
   Stop postponing the download of your `element` by manually telling postpone to load it.
+
+### .setThreshold([threshold])
+  Set postpone's threshold, the distance away from an edge of the viewport at which an element should be considered to be at the edge and thus loaded. `setThreshold()` accepts one optional argument and can be called at any point. The argument can be a string representing a distance in either `vh` or `px` units, a number, in which case the threshold will be interpretted as having `vh` units, or empty, effectively setting the threshold to 0.
 
 ## License
 
