@@ -252,7 +252,7 @@ Postpone.prototype.stop = function() {
  * @returns this
  */
 Postpone.prototype.scrollHandler = function( e ) {
-    var scrollElement = e.srcElement,
+    var scrollElement = e.srcElement || e.target,
         elements = this.scrollElements[ scrollElement === window.document ? scrollElement = "window" : scrollElement.getAttribute( "data-id" ) ],
         element = {},
         scrolledIntoView = false;
@@ -310,7 +310,7 @@ Postpone.prototype.offsetTop = function( el ) {
     var temp = el,
         o = 0;
     /** Iterate over all parents of el up to body to find the vertical offset. */
-    while ( temp && temp.tagName.toLowerCase() !== "body" ) {
+    while ( temp && temp.tagName.toLowerCase() !== "body" && temp.tagName.toLowerCase() !== "html" ) {
         o += temp.offsetTop;
         temp = temp.offsetParent;
     }
@@ -351,7 +351,9 @@ Postpone.prototype.isInViewport = function( el, scrollElement ) {
     /** If no scroll element is specified, then assume the scroll element is the window. */
     scrollElement = scrollElement? scrollElement : "window";
 
-    if ( scrollElement === "window" )  scrollElement = document.body;
+    if ( scrollElement === "window" ) {
+        scrollElement = document.documentElement.scrollTop ? document.documentElement : document.body;
+    }
     /** Use clientHeight instead of window.innerHeight for compatability with ie8. */
     var viewPortHeight = document.documentElement.clientHeight,
         top = this.offsetTop( el ),
