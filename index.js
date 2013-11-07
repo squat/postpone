@@ -334,7 +334,7 @@ Postpone.prototype.isVisible = function( el ) {
      * hidden.
      */
     while ( temp && temp.parentElement && isVisible ) {
-        isVisible = temp.style.display !== "none";
+        isVisible = temp.currentStyle ? temp.currentStyle.display !== "none" : document.defaultView.getComputedStyle( temp ).getPropertyValue( "display" ) !== "none";
         temp = temp.parentElement;
     }
 
