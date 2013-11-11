@@ -50,21 +50,13 @@ function Postpone( threshold ) {
  * @returns this
  */
 Postpone.prototype.postpone = function() {
-    var id = "";
-
     /**
      * Remove any previous event handlers so they can be reattached for new
      * postponed elements without duplicating old ones. This must be done
      * before updating the scroll elements so the references to the event
      * callbacks still exist.
      */
-    for ( id in this.scrollElements ) {
-        if ( id === "window" ) {
-            window.removeEventListener( "scroll", this.scrollElements[ id ].callback );
-        } else {
-            this.scrollElements[ id ].element.removeEventListener( "scroll", this.scrollElements[ id ].callback );
-        }
-    }
+    this.unbindEvents();
 
     /**
      * Update the elements and scroll elements to properly load or postpone
@@ -88,16 +80,39 @@ Postpone.prototype.postpone = function() {
 
     if ( this.elements.length ) {
        /** Attach scroll event listeners. */
-        for ( id in this.scrollElements ) {
-            this.scrollElements[ id ].callback = this.scrollHandler.bind( this );
-            if ( id === "window" ) {
-                window.addEventListener( "scroll", this.scrollElements[ id ].callback );
-            } else {
-                this.scrollElements[ id ].element.addEventListener( "scroll", this.scrollElements[ id ].callback );
-            }
+        this.bindEvents();
+    }
+
+    return this;
+};
+
+/**
+ * A helper method to unbind the scroll event callbacks.
+ * @returns this
+ */
+Postpone.prototype.unbindEvents = function() {
+    for ( var id in this.scrollElements ) {
+        if ( id === "window" ) {
+            window.removeEventListener( "scroll", this.scrollElements[ id ].callback );
+        } else {
+            this.scrollElements[ id ].element.removeEventListener( "scroll", this.scrollElements[ id ].callback );
         }
     }
-    return this;
+};
+
+/**
+ * A helper method to bind the scroll event callbacks.
+ * @returns this
+ */
+Postpone.prototype.bindEvents = function() {
+    for ( var id in this.scrollElements ) {
+        this.scrollElements[ id ].callback = this.scrollHandler.bind( this );
+        if ( id === "window" ) {
+            window.addEventListener( "scroll", this.scrollElements[ id ].callback );
+        } else {
+            this.scrollElements[ id ].element.addEventListener( "scroll", this.scrollElements[ id ].callback );
+        }
+    }
 };
 
 /**
@@ -236,11 +251,15 @@ Postpone.prototype.start = function() {
 };
 
 /**
- * Method to stop watching for elements that should postponed.
+ * Method to stop watching for elements that should postponed and unbind events
+ * associated with postponed elements.
  * @returns this
  */
 Postpone.prototype.stop = function() {
     if ( this.timeout ) window.clearTimeout( this.timeout );
+
+    /* Unbind the scroll events associated with postponed elements. */
+    this.unbindEvents();
 
     return this;
 };
