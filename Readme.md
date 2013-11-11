@@ -66,10 +66,10 @@ postpone.setThreshold( "200px" ).postpone() // Change the threshold to 200px.
 ## API
 
 ### .stop()
-  Stop watching the document for changes.
+  Stop all of postpone's functionality. This means postpone will stop watching the document for changes and will unbind any scroll events associated with postponed elements.
 
 ### .start()
-  If you have paused postpone's watcher, you can start it back up with `.start()`.
+  If you have paused postpone's watcher and unbound its scroll evnts using `.stop()`, you can start it all back up with `.start()`.
 
 ### .isInViewport(element, [scrollElement])
   Check if your `element` is somewhere in the browser's viewport, where `element` and `scrollElement` are DOM nodes. If `scrollElement` is not specified, postpone assumed `element` scrolls with respect to the document.
