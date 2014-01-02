@@ -22,7 +22,7 @@
 <img data-src="http://i.imgur.com/kDtVsrE.gif" postpone>
 ````
 
-  To make sure the resource loads when the element is visual, import the `postpone` module and create a new instance. This instance will automatically start watching your document.
+  To make sure the resource loads when the element is visible, import the `postpone` module and create a new instance. This instance will automatically start watching your document.
 
 ````js
 var Postpone = require( "postpone" );
@@ -69,10 +69,10 @@ postpone.setThreshold( "200px" ).postpone() // Change the threshold to 200px.
   Stop all of postpone's functionality. This means postpone will stop watching the document for changes and will unbind any scroll events associated with postponed elements.
 
 ### .start()
-  If you have paused postpone's watcher and unbound its scroll evnts using `.stop()`, you can start it all back up with `.start()`.
+  If you have paused postpone's watcher and unbound its scroll events using `.stop()`, you can start it all back up with `.start()`.
 
 ### .isInViewport(element, [scrollElement])
-  Check if your `element` is somewhere in the browser's viewport, where `element` and `scrollElement` are DOM nodes. If `scrollElement` is not specified, postpone assumed `element` scrolls with respect to the document.
+  Check if your `element` is somewhere in the browser's viewport, where `element` and `scrollElement` are DOM nodes. If `scrollElement` is not specified, postpone assumes that `element` scrolls with respect to the document.
 
 ### .isVisible(element)
   Check if your `element` is visually hidden, where `element` is a DOM node. This method checks if `element` or any parent element is hidden with the CSS style `display: none;`.
