@@ -22,28 +22,27 @@
 <img data-src="http://i.imgur.com/kDtVsrE.gif" postpone>
 ````
 
-  To make sure the resource loads when the element is visible, import the `postpone` module and create a new instance. This instance will automatically start watching your document.
+  Postpone is written using a [UMD](https://github.com/umdjs/umd) pattern so it can be used in CJS-style environments, with AMD loaders, or as a browser global. To start using postpone, import the `postpone` module and create a new instance; this instance will automatically start watching your document.
 
 ````js
+// If you are using postpone as a CJS module, require it like so:
 var Postpone = require( "postpone" );
 
-postpone = new Postpone(); // Creates a new instance and starts watching the document.
+var postpone = new Postpone(); // Creates a new instance and starts watching the document.
 ````
+
+*Note:*  If you are using postpone in a large project or as a dependency for a library you would like to distribute publicly, then it is advisable to import it as a module rather than use it as a global variable to avoid polluting the global namespace.
 
   By default, postpone will load an element's resource when that element scrolls into the viewport, however, you may want postpone to start loading your resources a bit before they scroll into view to ensure that they are available by the time they are on screen. Postpone lets you do this easily by passing a parameter to the constructor. If you feed postpone a number, postpone will assume you are using `vh` units, however you can also feed it a string with explicit units, such as `"150px"` or `"30vh"`. Currently, only `vh` and `px` units are supported.
 
 ````js
-var Postpone = require( "postpone" );
-
-postpone = new Postpone( 50 ); // Postpone will set the threshold to 50vh, or half a viewport.
+var postpone = new Postpone( 50 ); // Postpone will set the threshold to 50vh, or half a viewport.
 ````
 
 Optionally, you can manually change the threshold at any point in your code by calling the `.setThreshold()` method.
 
 ````js
-var Postpone = require( "postpone" );
-
-postpone = new Postpone() // Threshold defaults to 0vh
+var postpone = new Postpone() // Threshold defaults to 0vh
 
 ... // Do something with our code.
 
