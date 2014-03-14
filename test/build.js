@@ -472,7 +472,7 @@ require.register("postpone/index.js", Function("exports, require, module",
     * @returns this\n\
     */\n\
     Postpone.prototype.scrollHandler = function( e ) {\n\
-        var scrollElement = e.srcElement || e.target,\n\
+        var scrollElement = e.srcElement || e.target || window.document,\n\
             elements = this.scrollElements[ scrollElement === window.document ? scrollElement = \"window\" : scrollElement.getAttribute( \"data-id\" ) ],\n\
             element = {},\n\
             scrolledIntoView = false;\n\

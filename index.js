@@ -270,7 +270,7 @@
     * @returns this
     */
     Postpone.prototype.scrollHandler = function( e ) {
-        var scrollElement = e.srcElement || e.target,
+        var scrollElement = e.srcElement || e.target || window.document,
             elements = this.scrollElements[ scrollElement === window.document ? scrollElement = "window" : scrollElement.getAttribute( "data-id" ) ],
             element = {},
             scrolledIntoView = false;
