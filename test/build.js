@@ -330,7 +330,7 @@ require.register("postpone/index.js", Function("exports, require, module",
     Postpone.prototype.getElements = function() {\n\
         var elements = [],\n\
             visible = [],\n\
-            matches = Array.prototype.slice.call( document.querySelectorAll( this.tags ) ),\n\
+            matches = this._slice( document.querySelectorAll( this.tags ) ),\n\
             postpone = null;\n\
 \n\
         for ( var i = 0; i < matches.length; i++ ) {\n\
@@ -649,6 +649,29 @@ require.register("postpone/index.js", Function("exports, require, module",
         }\n\
 \n\
         return el;\n\
+    };\n\
+\n\
+    /**\n\
+    * A helper method to convert array-like objects into arrays.\n\
+    * @param {object} arr - The object to be converted.\n\
+    * @returns {array} An array representation of the supplied object.\n\
+    * @api private\n\
+    */\n\
+    Postpone.prototype._slice = function( object ) {\n\
+        /** Try to use `slice` to convert the object. */\n\
+        try {\n\
+            return Array.prototype.slice.call( object );\n\
+        /**\n\
+         * If that doesn't work, manually iterate over the object and convert\n\
+         * it to an array.\n\
+         */\n\
+        } finally {\n\
+            var array = [];\n\
+            for ( var i = 0; i < object.length; i++ ) {\n\
+                array.push( object[ i ] );\n\
+            }\n\
+            return array;\n\
+        }\n\
     };\n\
 \n\
     /** Expose `Postpone`. */\n\

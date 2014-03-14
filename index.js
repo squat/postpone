@@ -128,7 +128,7 @@
     Postpone.prototype.getElements = function() {
         var elements = [],
             visible = [],
-            matches = Array.prototype.slice.call( document.querySelectorAll( this.tags ) ),
+            matches = this._slice( document.querySelectorAll( this.tags ) ),
             postpone = null;
 
         for ( var i = 0; i < matches.length; i++ ) {
@@ -447,6 +447,29 @@
         }
 
         return el;
+    };
+
+    /**
+    * A helper method to convert array-like objects into arrays.
+    * @param {object} arr - The object to be converted.
+    * @returns {array} An array representation of the supplied object.
+    * @api private
+    */
+    Postpone.prototype._slice = function( object ) {
+        /** Try to use `slice` to convert the object. */
+        try {
+            return Array.prototype.slice.call( object );
+        /**
+         * If that doesn't work, manually iterate over the object and convert
+         * it to an array.
+         */
+        } finally {
+            var array = [];
+            for ( var i = 0; i < object.length; i++ ) {
+                array.push( object[ i ] );
+            }
+            return array;
+        }
     };
 
     /** Expose `Postpone`. */
