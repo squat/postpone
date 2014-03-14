@@ -478,7 +478,7 @@
             return el.addEventListener( "scroll", callback );
         /** If that doesn't work, add the event using `attachEvent`. */
         } catch(e) {
-            return el.attachEvent( "scroll", callback );
+            return el.attachEvent( "onscroll", callback );
         }
     };
 
@@ -496,7 +496,7 @@
             return el.removeEventListener( "scroll", callback );
         /** If that doesn't work, remove the event using `detachEvent`. */
         } catch(e) {
-            return el.detachEvent( "scroll", callback );
+            return el.detachEvent( "onscroll", callback );
         }
     };
 

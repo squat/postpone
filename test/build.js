@@ -680,7 +680,7 @@ require.register("postpone/index.js", Function("exports, require, module",
             return el.addEventListener( \"scroll\", callback );\n\
         /** If that doesn't work, add the event using `attachEvent`. */\n\
         } catch(e) {\n\
-            return el.attachEvent( \"scroll\", callback );\n\
+            return el.attachEvent( \"onscroll\", callback );\n\
         }\n\
     };\n\
 \n\
@@ -698,7 +698,7 @@ require.register("postpone/index.js", Function("exports, require, module",
             return el.removeEventListener( \"scroll\", callback );\n\
         /** If that doesn't work, remove the event using `detachEvent`. */\n\
         } catch(e) {\n\
-            return el.detachEvent( \"scroll\", callback );\n\
+            return el.detachEvent( \"onscroll\", callback );\n\
         }\n\
     };\n\
 \n\
