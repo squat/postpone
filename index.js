@@ -98,11 +98,7 @@
     */
     Postpone.prototype.unbindEvents = function() {
         for ( var id in this.scrollElements ) {
-            if ( id === "window" ) {
-                window.removeEventListener( "scroll", this.scrollElements[ id ].callback );
-            } else {
-                this.scrollElements[ id ].element.removeEventListener( "scroll", this.scrollElements[ id ].callback );
-            }
+            this._removeEventListener( id === "window" ? window : this.scrollElements[ id ].element, this.scrollElements[ id ].callback );
         }
     };
 
@@ -112,12 +108,8 @@
     */
     Postpone.prototype.bindEvents = function() {
         for ( var id in this.scrollElements ) {
-            this.scrollElements[ id ].callback = this.scrollHandler.bind( this );
-            if ( id === "window" ) {
-                window.addEventListener( "scroll", this.scrollElements[ id ].callback );
-            } else {
-                this.scrollElements[ id ].element.addEventListener( "scroll", this.scrollElements[ id ].callback );
-            }
+            this.scrollElements[ id ].callback = Function.prototype.bind ? this.scrollHandler.bind( this ) : function( _this ) { return function() { return _this.scrollHandler.apply( _this, arguments ); }; }( this );
+            this._addEventListener( id === "window" ? window : this.scrollElements[ id ].element, this.scrollElements[ id ].callback );
         }
     };
 
@@ -463,12 +455,48 @@
          * If that doesn't work, manually iterate over the object and convert
          * it to an array.
          */
-        } finally {
+        } catch(e) {
             var array = [];
             for ( var i = 0; i < object.length; i++ ) {
                 array.push( object[ i ] );
             }
             return array;
+        }
+    };
+
+    /**
+    * A helper method to abstract event listener creation.
+    * @param {object} el - The element to which the event should be added.
+    * @param {function} callback - The callback to be executed when the event
+    * is fired.
+    * @returns undefined
+    * @api private
+    */
+    Postpone.prototype._addEventListener = function( el, callback ) {
+        /** Try to add the event using `addEventListener`. */
+        try {
+            return el.addEventListener( "scroll", callback );
+        /** If that doesn't work, add the event using `attachEvent`. */
+        } catch(e) {
+            return el.attachEvent( "scroll", callback );
+        }
+    };
+
+    /**
+    * A helper method to abstract event listener removal.
+    * @param {object} el - The element from which the event should be removed.
+    * @param {function} callback - The callback to be executed when the event
+    * is fired.
+    * @returns undefined
+    * @api private
+    */
+    Postpone.prototype._removeEventListener = function( el, callback ) {
+        /** Try to remove the event using `removeEventListener`. */
+        try {
+            return el.removeEventListener( "scroll", callback );
+        /** If that doesn't work, remove the event using `detachEvent`. */
+        } catch(e) {
+            return el.detachEvent( "scroll", callback );
         }
     };
 
