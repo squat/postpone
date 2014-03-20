@@ -449,9 +449,11 @@
         else if ( el.tagName.toLowerCase() === "object" && el.getAttribute( "data-data" )) {
             el.setAttribute( "data", el.getAttribute( "data-data" ));
 
-            // This is necessary to make Safari (and, apparently, old versions of Chrome)
-            // re-render the new content; see:
-            // stackoverflow.com/questions/11245385/object-works-in-every-browser-except-google-chrome
+            /**
+            * This is necessary to make Safari (and, apparently, old versions of Chrome)
+            * re-render the new content; see:
+            * stackoverflow.com/questions/11245385/object-works-in-every-browser-except-google-chrome
+            */
             el.innerHTML = el.innerHTML;
         }
 
