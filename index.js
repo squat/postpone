@@ -29,7 +29,7 @@
             * @property {string} tags - A list of all the tags for which postpone
             * will work;
             */
-            this.tags = "audio, embed, iframe, img, image, picture, use, video, tref";
+            this.tags = "audio, embed, iframe, img, image, object, picture, use, video, tref";
             /**
             * @property {array} elements - An array of all the postponed elements in the document.
             */
@@ -444,6 +444,15 @@
                     }
                 }
             }
+        }
+
+        else if ( el.tagName.toLowerCase() === "object" && el.getAttribute( "data-data" )) {
+            el.setAttribute( "data", el.getAttribute( "data-data" ));
+
+            // This is necessary to make Safari (and, apparently, old versions of Chrome)
+            // re-render the new content; see:
+            // stackoverflow.com/questions/11245385/object-works-in-every-browser-except-google-chrome
+            el.innerHTML = el.innerHTML;
         }
 
         return el;
