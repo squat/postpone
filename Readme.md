@@ -51,7 +51,7 @@ postpone.setThreshold( "200px" ).postpone() // Change the threshold to 200px.
 
 *Note:* it is good practice to chain the `postpone()` method after changing the threshold to make sure postpone reexamines the postponed elements in the document and check if any of them should be loaded.
 
-  The postpone polyfill works with audio, embed, iframe, img, image, picture, use, video, and tref elements. *Note:* although the specification for `picture` is still evolving, postpone has basic support for it and is fully compatible with the [pictureTime polyfill](https://github.com/chuckcarpenter/picturetime).
+  The postpone polyfill works with audio, embed, iframe, img, image, object, picture, use, video, and tref elements. *Note:* although the specification for `picture` is still evolving, postpone has basic support for it and is fully compatible with the [pictureTime polyfill](https://github.com/chuckcarpenter/picturetime).
 
   Postpone works by modyfing the `src` and `xlink:href` attributes of elements and their descendant `source` elements when they become visible.
 

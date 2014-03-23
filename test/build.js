@@ -231,7 +231,7 @@ require.register("postpone/index.js", Function("exports, require, module",
             * @property {string} tags - A list of all the tags for which postpone\n\
             * will work;\n\
             */\n\
-            this.tags = \"audio, embed, iframe, img, image, picture, use, video, tref\";\n\
+            this.tags = \"audio, embed, iframe, img, image, object, picture, use, video, tref\";\n\
             /**\n\
             * @property {array} elements - An array of all the postponed elements in the document.\n\
             */\n\
@@ -638,6 +638,17 @@ require.register("postpone/index.js", Function("exports, require, module",
                     }\n\
                 }\n\
             }\n\
+        }\n\
+\n\
+        else if ( el.tagName.toLowerCase() === \"object\" && el.getAttribute( \"data-data\" )) {\n\
+            el.setAttribute( \"data\", el.getAttribute( \"data-data\" ));\n\
+\n\
+            /**\n\
+            * This is necessary to make Safari (and, apparently, old versions of Chrome)\n\
+            * re-render the new content; see:\n\
+            * stackoverflow.com/questions/11245385/object-works-in-every-browser-except-google-chrome\n\
+            */\n\
+            el.innerHTML = el.innerHTML;\n\
         }\n\
 \n\
         return el;\n\
