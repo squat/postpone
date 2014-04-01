@@ -442,11 +442,14 @@
             el.setAttribute( "data", el.getAttribute( "data-data" ));
 
             /**
-            * This is necessary to make Safari (and, apparently, old versions of Chrome)
-            * re-render the new content; see:
-            * stackoverflow.com/questions/11245385/object-works-in-every-browser-except-google-chrome
+            * This is necessary to make Safari 7 refresh the object's new content
             */
-            el.innerHTML = el.innerHTML;
+            var activeElement = document.activeElement;
+            el.focus();
+
+            if ( activeElement ) {
+                activeElement.focus();
+            }
         }
 
         return el;
