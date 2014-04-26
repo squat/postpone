@@ -1,6 +1,6 @@
 {
   "name": "postpone",
-  "version": "0.6.1",
+  "version": "0.6.2",
   "description": "A polyfill for postponing the loading of media.",
   "main": "index.js",
   "directories": {

@@ -638,15 +638,18 @@ require.register("postpone/index.js", Function("exports, require, module",
             }\n\
         }\n\
 \n\
-        else if ( el.tagName.toLowerCase() === \"object\" && el.getAttribute( \"data-data\" )) {\n\
-            el.setAttribute( \"data\", el.getAttribute( \"data-data\" ));\n\
+        else if ( el.tagName.toLowerCase() === \"object\" && el.getAttribute( \"data-data\" ) ) {\n\
+            el.setAttribute( \"data\", el.getAttribute( \"data-data\" ) );\n\
 \n\
             /**\n\
-             * This is necessary to make Safari (and, apparently, old versions of Chrome)\n\
-             * re-render the new content; see:\n\
-             * stackoverflow.com/questions/11245385/object-works-in-every-browser-except-google-chrome\n\
+             * This is necessary to make Safari 7 refresh the object's new content.\n\
              */\n\
-            el.innerHTML = el.innerHTML;\n\
+            var activeElement = document.activeElement;\n\
+            el.focus();\n\
+\n\
+            if ( activeElement ) {\n\
+                activeElement.focus();\n\
+            }\n\
         }\n\
 \n\
         return el;\n\
