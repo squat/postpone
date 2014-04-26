@@ -10,34 +10,39 @@
     "use strict";
 
     /**
-    * Creates a new Postpone instance.
-    * @constructor
-    * @param {number|string} [threshold] - The distance from an edge at which an
-    * element should be considered to be at the edge.
-    */
+     * Creates a new Postpone instance.
+     * @constructor
+     * @param {number|string} [threshold] - The distance from an edge at which an
+     * element should be considered to be at the edge.
+     */
     var Postpone = function( threshold ) {
         if ( !( this instanceof Postpone ) ) return new Postpone( threshold );
 
         /**
-        * The init method for Postpone gets the object running. It runs
-        * postpone.postpone() to attach scroll event handlers and check if any
-        * elements are already visible. Then, init will start the watch process.
-        * @returns this
-        */
+         * The init method for Postpone gets the object running. It runs
+         * postpone.postpone() to attach scroll event handlers and check if any
+         * elements are already visible. Then, init will start the watch process.
+         * @returns this
+         */
         this.init = function( threshold ) {
             /**
-            * @property {string} tags - A list of all the tags for which postpone
-            * will work;
-            */
+             * @property {string} tags - A list of all the tags for which postpone
+             * will work;
+             */
             this.tags = "audio, embed, iframe, img, image, object, picture, use, video, tref";
             /**
-            * @property {array} elements - An array of all the postponed elements in the document.
-            */
+             * @property {array} elements - An array of all the postponed elements in the document.
+             */
             this.elements = [];
             /**
-            * @property {object} scrollElements - A variable to keep track of the
-            * elements with respoect to which the postponed elements scroll.
-            */
+             * @property {array} visible - An array of all the non-hidden postponed
+             * elements in the document.
+             */
+            this.elements.visible = [];
+            /**
+             * @property {object} scrollElements - A variable to keep track of the
+             * elements with respoect to which the postponed elements scroll.
+             */
             this.scrollElements = [];
             this.setThreshold( threshold );
             this.postpone();
@@ -50,31 +55,31 @@
     };
 
     /**
-    * The main postpone method. This method iterates over all the elements with
-    * a `postpone` attribute and links them to a scroll event so that they are not
-    * loaded until they become visible.
-    * @returns this
-    */
+     * The main postpone method. This method iterates over all the elements with
+     * a `postpone` attribute and links them to a scroll event so that they are not
+     * loaded until they become visible.
+     * @returns this
+     */
     Postpone.prototype.postpone = function() {
         /**
-        * Remove any previous event handlers so they can be reattached for new
-        * postponed elements without duplicating old ones. This must be done
-        * before updating the scroll elements so the references to the event
-        * callbacks still exist.
-        */
+         * Remove any previous event handlers so they can be reattached for new
+         * postponed elements without duplicating old ones. This must be done
+         * before updating the scroll elements so the references to the event
+         * callbacks still exist.
+         */
         this.unbindEvents();
 
         /**
-        * Update the elements and scroll elements to properly load or postpone
-        * them.
-        */
+         * Update the elements and scroll elements to properly load or postpone
+         * them.
+         */
         this.getElements();
         this.getScrollElements();
 
         /**
-        * If any of the postponed elements should be visible to begin with,
-        * load them.
-        */
+         * If any of the postponed elements should be visible to begin with,
+         * load them.
+         */
         for ( var id in this.scrollElements ) {
             for ( var i = 0, element = {}; i < this.scrollElements[ id ].length; i++ ) {
                 element = this.scrollElements[ id ][ i ];
@@ -85,7 +90,7 @@
         }
 
         if ( this.elements.length ) {
-        /** Attach scroll event listeners. */
+            /** Attach scroll event listeners. */
             this.bindEvents();
         }
 
@@ -93,9 +98,9 @@
     };
 
     /**
-    * A helper method to unbind the scroll event callbacks.
-    * @returns this
-    */
+     * A helper method to unbind the scroll event callbacks.
+     * @returns this
+     */
     Postpone.prototype.unbindEvents = function() {
         for ( var id in this.scrollElements ) {
             this._removeEventListener( id === "window" ? window : this.scrollElements[ id ].element, this.scrollElements[ id ].callback );
@@ -103,25 +108,29 @@
     };
 
     /**
-    * A helper method to bind the scroll event callbacks.
-    * @returns this
-    */
+     * A helper method to bind the scroll event callbacks.
+     * @returns this
+     */
     Postpone.prototype.bindEvents = function() {
         for ( var id in this.scrollElements ) {
             this.scrollElements[ id ].callback = Function.prototype.bind ? this.scrollHandler.bind( this ) : function( _this ) { return function() { return _this.scrollHandler.apply( _this, arguments ); }; }( this );
             this._addEventListener( id === "window" ? window : this.scrollElements[ id ].element, this.scrollElements[ id ].callback );
         }
+
+        return this;
     };
 
     /**
-    * A helper method to find all of the elements with a postponed attribute.
-    * @returns {array} An array of nodes with a `truthy` postpone attribute.
-    */
+     * A helper method to find all of the elements with a postponed attribute.
+     * @returns {Boolean} A boolean stating whether new postpone elements have been
+     * found.
+     */
     Postpone.prototype.getElements = function() {
         var elements = [],
             visible = [],
             matches = this._slice( document.querySelectorAll( this.tags ) ),
-            postpone = null;
+            postpone = null,
+            change = false;
 
         for ( var i = 0; i < matches.length; i++ ) {
             postpone = matches[ i ].getAttribute( "postpone" );
@@ -129,26 +138,33 @@
                 elements.push( matches[ i ] );
                 if ( this.isVisible( matches[ i ] ) ) {
                     visible.push( matches[ i ] );
+                    /** Check if this element is not already postponed. */
+                    if ( !~this.elements.visible.indexOf( matches[ i ] ) ) {
+                        change = true;
+                    }
                 }
             }
         }
+
+        /** Check if old postponed elements are no longer on the page. */
+        if ( this.elements.visible.length !== visible.length ) {
+            change = true;
+        }
         this.elements = elements;
-        /**
-        * @property {array} visible - An array of all the non-hidden postponed
-        * elements in the document.
-        */
         this.elements.visible = visible;
+
+        return change;
     };
 
     /**
-    * A helper method to find all of the elements with respect to which
-    * postponed elements scroll. The elements are stored with a unique ID as
-    * their key.
-    * @returns {object} A hash with arrays of postponed elements associated with
-    * IDs of their scroll elements.
-    */
+     * A helper method to find all of the elements with respect to which
+     * postponed elements scroll. The elements are stored with a unique ID as
+     * their key.
+     * @returns {object} A hash with arrays of postponed elements associated with
+     * IDs of their scroll elements.
+     */
     Postpone.prototype.getScrollElements = function() {
-    this.scrollElements = {};
+        this.scrollElements = {};
 
         var id = "",
             element = {},
@@ -157,31 +173,31 @@
         for ( var i = 0; i < this.elements.visible.length; i++ ) {
             element = this.elements.visible[ i ];
             /**
-            * Find the element relative to which the postponed element's
-            * position should be calculated.
-            */
+             * Find the element relative to which the postponed element's
+             * position should be calculated.
+             */
             if ( element.getAttribute( "data-scroll-element" ) ) {
                 scrollElement = document.querySelector( element.getAttribute( "data-scroll-element" ) );
                 /**
-                * If the scroll element does not have an ID, generate one and
-                * assign it as a data attribute.
-                */
+                 * If the scroll element does not have an ID, generate one and
+                 * assign it as a data attribute.
+                 */
                 id = scrollElement.getAttribute( "data-id" );
                 if ( !id ) {
                     scrollElement.setAttribute( "data-id", id = new Date().getTime() );
                 }
             /**
-            * If the element does not have a scroll element specified then
-            * assume its position should be calculated relative to the window.
-            */
+             * If the element does not have a scroll element specified then
+             * assume its position should be calculated relative to the window.
+             */
             } else {
                 scrollElement = "window";
                 id = "window";
             }
             /**
-            * If the array already has this id as a key, then add the current
-            * element to the array in its value, otherwise create a new key.
-            */
+             * If the array already has this id as a key, then add the current
+             * element to the array in its value, otherwise create a new key.
+             */
             if ( this.scrollElements[ id ] ) {
                 this.scrollElements[ id ].push( element );
             } else {
@@ -193,43 +209,25 @@
     };
 
     /**
-    * A small helper that finds the posponed elements and returns them in a
-    * string.
-    * @param {array} elements - An array of elements to stringify.
-    * @returns {string} A string containing all the HTML of postponed elements.
-    */
-    Postpone.prototype.stringifyElements = function( elements ) {
-        var elementsString = "";
-
-        for ( var i = 0; i < elements.length; i++ ) {
-            elementsString += elements[ i ].outerHTML;
-        }
-
-        return elementsString;
-    };
-
-    /**
-    * Method to watch the document for new postponed elements.
-    * @param {string} [elementsString] - A string of non-visually hidden
-    * postponed elements.
-    * @returns this
-    */
-    Postpone.prototype.watch = function( elementsString ) {
-        /** Refresh the array of postponed elements, this.elements. */
-        this.getElements();
-        var newElementsString = this.stringifyElements( this.elements.visible );
-        /** If the postponed elements have changed, then postpone them. */
-        if ( elementsString !== newElementsString ) {
+     * Method to watch the document for new postponed elements.
+     * @returns this
+     */
+    Postpone.prototype.watch = function() {
+        /**
+         * Refresh the array of postponed elements, this.elements. If the postponed
+         * elements have changed, then process them.
+         */
+        if ( this.getElements() ) {
             this.postpone();
         }
         /**
-        * This timeout calls the watch method every 500ms. In other words,
-        * postpone will look for new postponed elements twice a second.
-        * @property {number} timeout - The ID for the current timeout.
-        */
+         * This timeout calls the watch method every 500ms. In other words,
+         * postpone will look for new postponed elements twice a second.
+         * @property {number} timeout - The ID for the current timeout.
+         */
         this.timeout = window.setTimeout( (function( _this ) {
             return function() {
-                return _this.watch( newElementsString );
+                return _this.watch();
             };
         })( this ), 500);
 
@@ -237,9 +235,9 @@
     };
 
     /**
-    * Method to start watching for elements that should postponed.
-    * @returns this
-    */
+     * Method to start watching for elements that should postponed.
+     * @returns this
+     */
     Postpone.prototype.start = function() {
         /** Ensure that watching has stopped before starting to watch. */
         if ( this.timeout ) this.stop();
@@ -250,10 +248,10 @@
     };
 
     /**
-    * Method to stop watching for elements that should postponed and unbind events
-    * associated with postponed elements.
-    * @returns this
-    */
+     * Method to stop watching for elements that should postponed and unbind events
+     * associated with postponed elements.
+     * @returns this
+     */
     Postpone.prototype.stop = function() {
         if ( this.timeout ) window.clearTimeout( this.timeout );
 
@@ -264,11 +262,11 @@
     };
 
     /**
-    * This method defines the scroll event handler used to test if postponed
-    * elementes are visible.
-    * @param {object} e - Event object.
-    * @returns this
-    */
+     * This method defines the scroll event handler used to test if postponed
+     * elementes are visible.
+     * @param {object} e - Event object.
+     * @returns this
+     */
     Postpone.prototype.scrollHandler = function( e ) {
         var scrollElement = e.srcElement || e.target || window.document,
             elements = this.scrollElements[ scrollElement === window.document ? scrollElement = "window" : scrollElement.getAttribute( "data-id" ) ],
@@ -279,9 +277,9 @@
             element = elements[ i ];
 
             /**
-            * If an element is visible then we no longer need to postpone it
-            * and can download it.
-            */
+             * If an element is visible then we no longer need to postpone it
+             * and can download it.
+             */
             if ( this.isInViewport( element, scrollElement ) ) {
             this.load( element );
             }
@@ -291,39 +289,39 @@
     };
 
     /**
-    * A convenience method to easily set the threshold property of postpone.
-    * @param {number|string} threshold - The distance from an edge at which an
-    * element should be considered to be at the edge.
-    * @returns this
-    */
+     * A convenience method to easily set the threshold property of postpone.
+     * @param {number|string} threshold - The distance from an edge at which an
+     * element should be considered to be at the edge.
+     * @returns this
+     */
     Postpone.prototype.setThreshold = function( threshold ) {
         threshold = threshold ? threshold : 0;
         /**
-        * @property {object} threshold - A hash containing the value and unit of
-        * measurement of the desired postpone threshold.
-        */
+         * @property {object} threshold - A hash containing the value and unit of
+         * measurement of the desired postpone threshold.
+         */
         this.threshold = {};
         /**
-        * @property {number} value - The number of units from an edge at
-        * which an element should be considered to be at the edge. This is
-        * useful to start loading images or other resources before they scroll
-        * into view to prevent flash of content.
-        */
+         * @property {number} value - The number of units from an edge at
+         * which an element should be considered to be at the edge. This is
+         * useful to start loading images or other resources before they scroll
+         * into view to prevent flash of content.
+         */
         this.threshold.value = parseInt( threshold, 10 );
         /**
-        * @property {string} unit - The unit of measurement for the threshold
-        * value. Currently, only `vh` and `px` are supported. By default, the unit
-        * is `vh`.
-        */
+         * @property {string} unit - The unit of measurement for the threshold
+         * value. Currently, only `vh` and `px` are supported. By default, the unit
+         * is `vh`.
+         */
         this.threshold.unit = ( typeof threshold === "number" ) ? "vh" : ( threshold.match(/[a-zA-Z]+/)[ 0 ] || "vh" );
 
         return this;
     };
     /**
-    * Small helper method to find the total vertical offset of an element.
-    * @param {object} el - The element we wish to locate.
-    * @returns {number} The total vertical offset of the element.
-    */
+     * Small helper method to find the total vertical offset of an element.
+     * @param {object} el - The element we wish to locate.
+     * @returns {number} The total vertical offset of the element.
+     */
     Postpone.prototype.offsetTop = function( el ) {
         var temp = el,
             o = 0;
@@ -337,20 +335,20 @@
     };
 
     /**
-    * Small helper method to determine if an element is visually hidden or not.
-    * This method check if the element provided, or any of its parents have the
-    * style `display: none;`.
-    * @param {object} el - The element we wish to locate.
-    * @returns {boolean} Returns true if the element is visible and false if it is
-    * hidden.
-    */
+     * Small helper method to determine if an element is visually hidden or not.
+     * This method check if the element provided, or any of its parents have the
+     * style `display: none;`.
+     * @param {object} el - The element we wish to locate.
+     * @returns {boolean} Returns true if the element is visible and false if it is
+     * hidden.
+     */
     Postpone.prototype.isVisible = function( el ) {
         var temp = el,
             isVisible = true;
         /**
-        * Iterate over all parents of el up to HTML to find if el or a parent is
-        * hidden.
-        */
+         * Iterate over all parents of el up to HTML to find if el or a parent is
+         * hidden.
+         */
         while ( temp && temp.parentElement && isVisible ) {
             isVisible = temp.currentStyle ? temp.currentStyle.display !== "none" : document.defaultView.getComputedStyle( temp ).getPropertyValue( "display" ) !== "none";
             temp = temp.parentElement;
@@ -360,11 +358,11 @@
     };
 
     /**
-    * Helper method to determine if an element is in the browser's viewport.
-    * @param {object} el - The element we wish to test.
-    * @param {object} [scrollElement] - The element with respect to which `el` scrolls.
-    * @returns {boolean} Return true if the `el` is in view and false if it is not.
-    */
+     * Helper method to determine if an element is in the browser's viewport.
+     * @param {object} el - The element we wish to test.
+     * @param {object} [scrollElement] - The element with respect to which `el` scrolls.
+     * @returns {boolean} Return true if the `el` is in view and false if it is not.
+     */
     Postpone.prototype.isInViewport = function( el, scrollElement ) {
         /** If no scroll element is specified, then assume the scroll element is the window. */
         scrollElement = scrollElement ? scrollElement : "window";
@@ -396,11 +394,11 @@
     };
 
     /**
-    * This method takes care of loading the media that should no longer be
-    * postponed.
-    * @param {object} el - The element that should be loaded.
-    * @returns {object} The element that was loaded.
-    */
+     * This method takes care of loading the media that should no longer be
+     * postponed.
+     * @param {object} el - The element that should be loaded.
+     * @returns {object} The element that was loaded.
+     */
     Postpone.prototype.load = function( el ) {
         var child = {},
             i = 0;
@@ -442,10 +440,10 @@
             el.setAttribute( "data", el.getAttribute( "data-data" ));
 
             /**
-            * This is necessary to make Safari (and, apparently, old versions of Chrome)
-            * re-render the new content; see:
-            * stackoverflow.com/questions/11245385/object-works-in-every-browser-except-google-chrome
-            */
+             * This is necessary to make Safari (and, apparently, old versions of Chrome)
+             * re-render the new content; see:
+             * stackoverflow.com/questions/11245385/object-works-in-every-browser-except-google-chrome
+             */
             el.innerHTML = el.innerHTML;
         }
 
@@ -453,11 +451,11 @@
     };
 
     /**
-    * A helper method to convert array-like objects into arrays.
-    * @param {object} arr - The object to be converted.
-    * @returns {array} An array representation of the supplied object.
-    * @api private
-    */
+     * A helper method to convert array-like objects into arrays.
+     * @param {object} arr - The object to be converted.
+     * @returns {array} An array representation of the supplied object.
+     * @api private
+     */
     Postpone.prototype._slice = function( object ) {
         /** Try to use `slice` to convert the object. */
         try {
@@ -476,13 +474,13 @@
     };
 
     /**
-    * A helper method to abstract event listener creation.
-    * @param {object} el - The element to which the event should be added.
-    * @param {function} callback - The callback to be executed when the event
-    * is fired.
-    * @returns undefined
-    * @api private
-    */
+     * A helper method to abstract event listener creation.
+     * @param {object} el - The element to which the event should be added.
+     * @param {function} callback - The callback to be executed when the event
+     * is fired.
+     * @returns undefined
+     * @api private
+     */
     Postpone.prototype._addEventListener = function( el, callback ) {
         /** Try to add the event using `addEventListener`. */
         try {
@@ -494,13 +492,13 @@
     };
 
     /**
-    * A helper method to abstract event listener removal.
-    * @param {object} el - The element from which the event should be removed.
-    * @param {function} callback - The callback to be executed when the event
-    * is fired.
-    * @returns undefined
-    * @api private
-    */
+     * A helper method to abstract event listener removal.
+     * @param {object} el - The element from which the event should be removed.
+     * @param {function} callback - The callback to be executed when the event
+     * is fired.
+     * @returns undefined
+     * @api private
+     */
     Postpone.prototype._removeEventListener = function( el, callback ) {
         /** Try to remove the event using `removeEventListener`. */
         try {

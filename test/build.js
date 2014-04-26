@@ -212,34 +212,39 @@ require.register("postpone/index.js", Function("exports, require, module",
     \"use strict\";\n\
 \n\
     /**\n\
-    * Creates a new Postpone instance.\n\
-    * @constructor\n\
-    * @param {number|string} [threshold] - The distance from an edge at which an\n\
-    * element should be considered to be at the edge.\n\
-    */\n\
+     * Creates a new Postpone instance.\n\
+     * @constructor\n\
+     * @param {number|string} [threshold] - The distance from an edge at which an\n\
+     * element should be considered to be at the edge.\n\
+     */\n\
     var Postpone = function( threshold ) {\n\
         if ( !( this instanceof Postpone ) ) return new Postpone( threshold );\n\
 \n\
         /**\n\
-        * The init method for Postpone gets the object running. It runs\n\
-        * postpone.postpone() to attach scroll event handlers and check if any\n\
-        * elements are already visible. Then, init will start the watch process.\n\
-        * @returns this\n\
-        */\n\
+         * The init method for Postpone gets the object running. It runs\n\
+         * postpone.postpone() to attach scroll event handlers and check if any\n\
+         * elements are already visible. Then, init will start the watch process.\n\
+         * @returns this\n\
+         */\n\
         this.init = function( threshold ) {\n\
             /**\n\
-            * @property {string} tags - A list of all the tags for which postpone\n\
-            * will work;\n\
-            */\n\
+             * @property {string} tags - A list of all the tags for which postpone\n\
+             * will work;\n\
+             */\n\
             this.tags = \"audio, embed, iframe, img, image, object, picture, use, video, tref\";\n\
             /**\n\
-            * @property {array} elements - An array of all the postponed elements in the document.\n\
-            */\n\
+             * @property {array} elements - An array of all the postponed elements in the document.\n\
+             */\n\
             this.elements = [];\n\
             /**\n\
-            * @property {object} scrollElements - A variable to keep track of the\n\
-            * elements with respoect to which the postponed elements scroll.\n\
-            */\n\
+             * @property {array} visible - An array of all the non-hidden postponed\n\
+             * elements in the document.\n\
+             */\n\
+            this.elements.visible = [];\n\
+            /**\n\
+             * @property {object} scrollElements - A variable to keep track of the\n\
+             * elements with respoect to which the postponed elements scroll.\n\
+             */\n\
             this.scrollElements = [];\n\
             this.setThreshold( threshold );\n\
             this.postpone();\n\
@@ -252,31 +257,31 @@ require.register("postpone/index.js", Function("exports, require, module",
     };\n\
 \n\
     /**\n\
-    * The main postpone method. This method iterates over all the elements with\n\
-    * a `postpone` attribute and links them to a scroll event so that they are not\n\
-    * loaded until they become visible.\n\
-    * @returns this\n\
-    */\n\
+     * The main postpone method. This method iterates over all the elements with\n\
+     * a `postpone` attribute and links them to a scroll event so that they are not\n\
+     * loaded until they become visible.\n\
+     * @returns this\n\
+     */\n\
     Postpone.prototype.postpone = function() {\n\
         /**\n\
-        * Remove any previous event handlers so they can be reattached for new\n\
-        * postponed elements without duplicating old ones. This must be done\n\
-        * before updating the scroll elements so the references to the event\n\
-        * callbacks still exist.\n\
-        */\n\
+         * Remove any previous event handlers so they can be reattached for new\n\
+         * postponed elements without duplicating old ones. This must be done\n\
+         * before updating the scroll elements so the references to the event\n\
+         * callbacks still exist.\n\
+         */\n\
         this.unbindEvents();\n\
 \n\
         /**\n\
-        * Update the elements and scroll elements to properly load or postpone\n\
-        * them.\n\
-        */\n\
+         * Update the elements and scroll elements to properly load or postpone\n\
+         * them.\n\
+         */\n\
         this.getElements();\n\
         this.getScrollElements();\n\
 \n\
         /**\n\
-        * If any of the postponed elements should be visible to begin with,\n\
-        * load them.\n\
-        */\n\
+         * If any of the postponed elements should be visible to begin with,\n\
+         * load them.\n\
+         */\n\
         for ( var id in this.scrollElements ) {\n\
             for ( var i = 0, element = {}; i < this.scrollElements[ id ].length; i++ ) {\n\
                 element = this.scrollElements[ id ][ i ];\n\
@@ -287,7 +292,7 @@ require.register("postpone/index.js", Function("exports, require, module",
         }\n\
 \n\
         if ( this.elements.length ) {\n\
-        /** Attach scroll event listeners. */\n\
+            /** Attach scroll event listeners. */\n\
             this.bindEvents();\n\
         }\n\
 \n\
@@ -295,9 +300,9 @@ require.register("postpone/index.js", Function("exports, require, module",
     };\n\
 \n\
     /**\n\
-    * A helper method to unbind the scroll event callbacks.\n\
-    * @returns this\n\
-    */\n\
+     * A helper method to unbind the scroll event callbacks.\n\
+     * @returns this\n\
+     */\n\
     Postpone.prototype.unbindEvents = function() {\n\
         for ( var id in this.scrollElements ) {\n\
             this._removeEventListener( id === \"window\" ? window : this.scrollElements[ id ].element, this.scrollElements[ id ].callback );\n\
@@ -305,25 +310,29 @@ require.register("postpone/index.js", Function("exports, require, module",
     };\n\
 \n\
     /**\n\
-    * A helper method to bind the scroll event callbacks.\n\
-    * @returns this\n\
-    */\n\
+     * A helper method to bind the scroll event callbacks.\n\
+     * @returns this\n\
+     */\n\
     Postpone.prototype.bindEvents = function() {\n\
         for ( var id in this.scrollElements ) {\n\
             this.scrollElements[ id ].callback = Function.prototype.bind ? this.scrollHandler.bind( this ) : function( _this ) { return function() { return _this.scrollHandler.apply( _this, arguments ); }; }( this );\n\
             this._addEventListener( id === \"window\" ? window : this.scrollElements[ id ].element, this.scrollElements[ id ].callback );\n\
         }\n\
+\n\
+        return this;\n\
     };\n\
 \n\
     /**\n\
-    * A helper method to find all of the elements with a postponed attribute.\n\
-    * @returns {array} An array of nodes with a `truthy` postpone attribute.\n\
-    */\n\
+     * A helper method to find all of the elements with a postponed attribute.\n\
+     * @returns {Boolean} A boolean stating whether new postpone elements have been\n\
+     * found.\n\
+     */\n\
     Postpone.prototype.getElements = function() {\n\
         var elements = [],\n\
             visible = [],\n\
             matches = this._slice( document.querySelectorAll( this.tags ) ),\n\
-            postpone = null;\n\
+            postpone = null,\n\
+            change = false;\n\
 \n\
         for ( var i = 0; i < matches.length; i++ ) {\n\
             postpone = matches[ i ].getAttribute( \"postpone\" );\n\
@@ -331,26 +340,33 @@ require.register("postpone/index.js", Function("exports, require, module",
                 elements.push( matches[ i ] );\n\
                 if ( this.isVisible( matches[ i ] ) ) {\n\
                     visible.push( matches[ i ] );\n\
+                    /** Check if this element is not already postponed. */\n\
+                    if ( !~this.elements.visible.indexOf( matches[ i ] ) ) {\n\
+                        change = true;\n\
+                    }\n\
                 }\n\
             }\n\
         }\n\
+\n\
+        /** Check if old postponed elements are no longer on the page. */\n\
+        if ( this.elements.visible.length !== visible.length ) {\n\
+            change = true;\n\
+        }\n\
         this.elements = elements;\n\
-        /**\n\
-        * @property {array} visible - An array of all the non-hidden postponed\n\
-        * elements in the document.\n\
-        */\n\
         this.elements.visible = visible;\n\
+\n\
+        return change;\n\
     };\n\
 \n\
     /**\n\
-    * A helper method to find all of the elements with respect to which\n\
-    * postponed elements scroll. The elements are stored with a unique ID as\n\
-    * their key.\n\
-    * @returns {object} A hash with arrays of postponed elements associated with\n\
-    * IDs of their scroll elements.\n\
-    */\n\
+     * A helper method to find all of the elements with respect to which\n\
+     * postponed elements scroll. The elements are stored with a unique ID as\n\
+     * their key.\n\
+     * @returns {object} A hash with arrays of postponed elements associated with\n\
+     * IDs of their scroll elements.\n\
+     */\n\
     Postpone.prototype.getScrollElements = function() {\n\
-    this.scrollElements = {};\n\
+        this.scrollElements = {};\n\
 \n\
         var id = \"\",\n\
             element = {},\n\
@@ -359,31 +375,31 @@ require.register("postpone/index.js", Function("exports, require, module",
         for ( var i = 0; i < this.elements.visible.length; i++ ) {\n\
             element = this.elements.visible[ i ];\n\
             /**\n\
-            * Find the element relative to which the postponed element's\n\
-            * position should be calculated.\n\
-            */\n\
+             * Find the element relative to which the postponed element's\n\
+             * position should be calculated.\n\
+             */\n\
             if ( element.getAttribute( \"data-scroll-element\" ) ) {\n\
                 scrollElement = document.querySelector( element.getAttribute( \"data-scroll-element\" ) );\n\
                 /**\n\
-                * If the scroll element does not have an ID, generate one and\n\
-                * assign it as a data attribute.\n\
-                */\n\
+                 * If the scroll element does not have an ID, generate one and\n\
+                 * assign it as a data attribute.\n\
+                 */\n\
                 id = scrollElement.getAttribute( \"data-id\" );\n\
                 if ( !id ) {\n\
                     scrollElement.setAttribute( \"data-id\", id = new Date().getTime() );\n\
                 }\n\
             /**\n\
-            * If the element does not have a scroll element specified then\n\
-            * assume its position should be calculated relative to the window.\n\
-            */\n\
+             * If the element does not have a scroll element specified then\n\
+             * assume its position should be calculated relative to the window.\n\
+             */\n\
             } else {\n\
                 scrollElement = \"window\";\n\
                 id = \"window\";\n\
             }\n\
             /**\n\
-            * If the array already has this id as a key, then add the current\n\
-            * element to the array in its value, otherwise create a new key.\n\
-            */\n\
+             * If the array already has this id as a key, then add the current\n\
+             * element to the array in its value, otherwise create a new key.\n\
+             */\n\
             if ( this.scrollElements[ id ] ) {\n\
                 this.scrollElements[ id ].push( element );\n\
             } else {\n\
@@ -395,43 +411,25 @@ require.register("postpone/index.js", Function("exports, require, module",
     };\n\
 \n\
     /**\n\
-    * A small helper that finds the posponed elements and returns them in a\n\
-    * string.\n\
-    * @param {array} elements - An array of elements to stringify.\n\
-    * @returns {string} A string containing all the HTML of postponed elements.\n\
-    */\n\
-    Postpone.prototype.stringifyElements = function( elements ) {\n\
-        var elementsString = \"\";\n\
-\n\
-        for ( var i = 0; i < elements.length; i++ ) {\n\
-            elementsString += elements[ i ].outerHTML;\n\
-        }\n\
-\n\
-        return elementsString;\n\
-    };\n\
-\n\
-    /**\n\
-    * Method to watch the document for new postponed elements.\n\
-    * @param {string} [elementsString] - A string of non-visually hidden\n\
-    * postponed elements.\n\
-    * @returns this\n\
-    */\n\
-    Postpone.prototype.watch = function( elementsString ) {\n\
-        /** Refresh the array of postponed elements, this.elements. */\n\
-        this.getElements();\n\
-        var newElementsString = this.stringifyElements( this.elements.visible );\n\
-        /** If the postponed elements have changed, then postpone them. */\n\
-        if ( elementsString !== newElementsString ) {\n\
+     * Method to watch the document for new postponed elements.\n\
+     * @returns this\n\
+     */\n\
+    Postpone.prototype.watch = function() {\n\
+        /**\n\
+         * Refresh the array of postponed elements, this.elements. If the postponed\n\
+         * elements have changed, then process them.\n\
+         */\n\
+        if ( this.getElements() ) {\n\
             this.postpone();\n\
         }\n\
         /**\n\
-        * This timeout calls the watch method every 500ms. In other words,\n\
-        * postpone will look for new postponed elements twice a second.\n\
-        * @property {number} timeout - The ID for the current timeout.\n\
-        */\n\
+         * This timeout calls the watch method every 500ms. In other words,\n\
+         * postpone will look for new postponed elements twice a second.\n\
+         * @property {number} timeout - The ID for the current timeout.\n\
+         */\n\
         this.timeout = window.setTimeout( (function( _this ) {\n\
             return function() {\n\
-                return _this.watch( newElementsString );\n\
+                return _this.watch();\n\
             };\n\
         })( this ), 500);\n\
 \n\
@@ -439,9 +437,9 @@ require.register("postpone/index.js", Function("exports, require, module",
     };\n\
 \n\
     /**\n\
-    * Method to start watching for elements that should postponed.\n\
-    * @returns this\n\
-    */\n\
+     * Method to start watching for elements that should postponed.\n\
+     * @returns this\n\
+     */\n\
     Postpone.prototype.start = function() {\n\
         /** Ensure that watching has stopped before starting to watch. */\n\
         if ( this.timeout ) this.stop();\n\
@@ -452,10 +450,10 @@ require.register("postpone/index.js", Function("exports, require, module",
     };\n\
 \n\
     /**\n\
-    * Method to stop watching for elements that should postponed and unbind events\n\
-    * associated with postponed elements.\n\
-    * @returns this\n\
-    */\n\
+     * Method to stop watching for elements that should postponed and unbind events\n\
+     * associated with postponed elements.\n\
+     * @returns this\n\
+     */\n\
     Postpone.prototype.stop = function() {\n\
         if ( this.timeout ) window.clearTimeout( this.timeout );\n\
 \n\
@@ -466,11 +464,11 @@ require.register("postpone/index.js", Function("exports, require, module",
     };\n\
 \n\
     /**\n\
-    * This method defines the scroll event handler used to test if postponed\n\
-    * elementes are visible.\n\
-    * @param {object} e - Event object.\n\
-    * @returns this\n\
-    */\n\
+     * This method defines the scroll event handler used to test if postponed\n\
+     * elementes are visible.\n\
+     * @param {object} e - Event object.\n\
+     * @returns this\n\
+     */\n\
     Postpone.prototype.scrollHandler = function( e ) {\n\
         var scrollElement = e.srcElement || e.target || window.document,\n\
             elements = this.scrollElements[ scrollElement === window.document ? scrollElement = \"window\" : scrollElement.getAttribute( \"data-id\" ) ],\n\
@@ -481,9 +479,9 @@ require.register("postpone/index.js", Function("exports, require, module",
             element = elements[ i ];\n\
 \n\
             /**\n\
-            * If an element is visible then we no longer need to postpone it\n\
-            * and can download it.\n\
-            */\n\
+             * If an element is visible then we no longer need to postpone it\n\
+             * and can download it.\n\
+             */\n\
             if ( this.isInViewport( element, scrollElement ) ) {\n\
             this.load( element );\n\
             }\n\
@@ -493,39 +491,39 @@ require.register("postpone/index.js", Function("exports, require, module",
     };\n\
 \n\
     /**\n\
-    * A convenience method to easily set the threshold property of postpone.\n\
-    * @param {number|string} threshold - The distance from an edge at which an\n\
-    * element should be considered to be at the edge.\n\
-    * @returns this\n\
-    */\n\
+     * A convenience method to easily set the threshold property of postpone.\n\
+     * @param {number|string} threshold - The distance from an edge at which an\n\
+     * element should be considered to be at the edge.\n\
+     * @returns this\n\
+     */\n\
     Postpone.prototype.setThreshold = function( threshold ) {\n\
         threshold = threshold ? threshold : 0;\n\
         /**\n\
-        * @property {object} threshold - A hash containing the value and unit of\n\
-        * measurement of the desired postpone threshold.\n\
-        */\n\
+         * @property {object} threshold - A hash containing the value and unit of\n\
+         * measurement of the desired postpone threshold.\n\
+         */\n\
         this.threshold = {};\n\
         /**\n\
-        * @property {number} value - The number of units from an edge at\n\
-        * which an element should be considered to be at the edge. This is\n\
-        * useful to start loading images or other resources before they scroll\n\
-        * into view to prevent flash of content.\n\
-        */\n\
+         * @property {number} value - The number of units from an edge at\n\
+         * which an element should be considered to be at the edge. This is\n\
+         * useful to start loading images or other resources before they scroll\n\
+         * into view to prevent flash of content.\n\
+         */\n\
         this.threshold.value = parseInt( threshold, 10 );\n\
         /**\n\
-        * @property {string} unit - The unit of measurement for the threshold\n\
-        * value. Currently, only `vh` and `px` are supported. By default, the unit\n\
-        * is `vh`.\n\
-        */\n\
+         * @property {string} unit - The unit of measurement for the threshold\n\
+         * value. Currently, only `vh` and `px` are supported. By default, the unit\n\
+         * is `vh`.\n\
+         */\n\
         this.threshold.unit = ( typeof threshold === \"number\" ) ? \"vh\" : ( threshold.match(/[a-zA-Z]+/)[ 0 ] || \"vh\" );\n\
 \n\
         return this;\n\
     };\n\
     /**\n\
-    * Small helper method to find the total vertical offset of an element.\n\
-    * @param {object} el - The element we wish to locate.\n\
-    * @returns {number} The total vertical offset of the element.\n\
-    */\n\
+     * Small helper method to find the total vertical offset of an element.\n\
+     * @param {object} el - The element we wish to locate.\n\
+     * @returns {number} The total vertical offset of the element.\n\
+     */\n\
     Postpone.prototype.offsetTop = function( el ) {\n\
         var temp = el,\n\
             o = 0;\n\
@@ -539,20 +537,20 @@ require.register("postpone/index.js", Function("exports, require, module",
     };\n\
 \n\
     /**\n\
-    * Small helper method to determine if an element is visually hidden or not.\n\
-    * This method check if the element provided, or any of its parents have the\n\
-    * style `display: none;`.\n\
-    * @param {object} el - The element we wish to locate.\n\
-    * @returns {boolean} Returns true if the element is visible and false if it is\n\
-    * hidden.\n\
-    */\n\
+     * Small helper method to determine if an element is visually hidden or not.\n\
+     * This method check if the element provided, or any of its parents have the\n\
+     * style `display: none;`.\n\
+     * @param {object} el - The element we wish to locate.\n\
+     * @returns {boolean} Returns true if the element is visible and false if it is\n\
+     * hidden.\n\
+     */\n\
     Postpone.prototype.isVisible = function( el ) {\n\
         var temp = el,\n\
             isVisible = true;\n\
         /**\n\
-        * Iterate over all parents of el up to HTML to find if el or a parent is\n\
-        * hidden.\n\
-        */\n\
+         * Iterate over all parents of el up to HTML to find if el or a parent is\n\
+         * hidden.\n\
+         */\n\
         while ( temp && temp.parentElement && isVisible ) {\n\
             isVisible = temp.currentStyle ? temp.currentStyle.display !== \"none\" : document.defaultView.getComputedStyle( temp ).getPropertyValue( \"display\" ) !== \"none\";\n\
             temp = temp.parentElement;\n\
@@ -562,11 +560,11 @@ require.register("postpone/index.js", Function("exports, require, module",
     };\n\
 \n\
     /**\n\
-    * Helper method to determine if an element is in the browser's viewport.\n\
-    * @param {object} el - The element we wish to test.\n\
-    * @param {object} [scrollElement] - The element with respect to which `el` scrolls.\n\
-    * @returns {boolean} Return true if the `el` is in view and false if it is not.\n\
-    */\n\
+     * Helper method to determine if an element is in the browser's viewport.\n\
+     * @param {object} el - The element we wish to test.\n\
+     * @param {object} [scrollElement] - The element with respect to which `el` scrolls.\n\
+     * @returns {boolean} Return true if the `el` is in view and false if it is not.\n\
+     */\n\
     Postpone.prototype.isInViewport = function( el, scrollElement ) {\n\
         /** If no scroll element is specified, then assume the scroll element is the window. */\n\
         scrollElement = scrollElement ? scrollElement : \"window\";\n\
@@ -598,11 +596,11 @@ require.register("postpone/index.js", Function("exports, require, module",
     };\n\
 \n\
     /**\n\
-    * This method takes care of loading the media that should no longer be\n\
-    * postponed.\n\
-    * @param {object} el - The element that should be loaded.\n\
-    * @returns {object} The element that was loaded.\n\
-    */\n\
+     * This method takes care of loading the media that should no longer be\n\
+     * postponed.\n\
+     * @param {object} el - The element that should be loaded.\n\
+     * @returns {object} The element that was loaded.\n\
+     */\n\
     Postpone.prototype.load = function( el ) {\n\
         var child = {},\n\
             i = 0;\n\
@@ -644,10 +642,10 @@ require.register("postpone/index.js", Function("exports, require, module",
             el.setAttribute( \"data\", el.getAttribute( \"data-data\" ));\n\
 \n\
             /**\n\
-            * This is necessary to make Safari (and, apparently, old versions of Chrome)\n\
-            * re-render the new content; see:\n\
-            * stackoverflow.com/questions/11245385/object-works-in-every-browser-except-google-chrome\n\
-            */\n\
+             * This is necessary to make Safari (and, apparently, old versions of Chrome)\n\
+             * re-render the new content; see:\n\
+             * stackoverflow.com/questions/11245385/object-works-in-every-browser-except-google-chrome\n\
+             */\n\
             el.innerHTML = el.innerHTML;\n\
         }\n\
 \n\
@@ -655,11 +653,11 @@ require.register("postpone/index.js", Function("exports, require, module",
     };\n\
 \n\
     /**\n\
-    * A helper method to convert array-like objects into arrays.\n\
-    * @param {object} arr - The object to be converted.\n\
-    * @returns {array} An array representation of the supplied object.\n\
-    * @api private\n\
-    */\n\
+     * A helper method to convert array-like objects into arrays.\n\
+     * @param {object} arr - The object to be converted.\n\
+     * @returns {array} An array representation of the supplied object.\n\
+     * @api private\n\
+     */\n\
     Postpone.prototype._slice = function( object ) {\n\
         /** Try to use `slice` to convert the object. */\n\
         try {\n\
@@ -678,13 +676,13 @@ require.register("postpone/index.js", Function("exports, require, module",
     };\n\
 \n\
     /**\n\
-    * A helper method to abstract event listener creation.\n\
-    * @param {object} el - The element to which the event should be added.\n\
-    * @param {function} callback - The callback to be executed when the event\n\
-    * is fired.\n\
-    * @returns undefined\n\
-    * @api private\n\
-    */\n\
+     * A helper method to abstract event listener creation.\n\
+     * @param {object} el - The element to which the event should be added.\n\
+     * @param {function} callback - The callback to be executed when the event\n\
+     * is fired.\n\
+     * @returns undefined\n\
+     * @api private\n\
+     */\n\
     Postpone.prototype._addEventListener = function( el, callback ) {\n\
         /** Try to add the event using `addEventListener`. */\n\
         try {\n\
@@ -696,13 +694,13 @@ require.register("postpone/index.js", Function("exports, require, module",
     };\n\
 \n\
     /**\n\
-    * A helper method to abstract event listener removal.\n\
-    * @param {object} el - The element from which the event should be removed.\n\
-    * @param {function} callback - The callback to be executed when the event\n\
-    * is fired.\n\
-    * @returns undefined\n\
-    * @api private\n\
-    */\n\
+     * A helper method to abstract event listener removal.\n\
+     * @param {object} el - The element from which the event should be removed.\n\
+     * @param {function} callback - The callback to be executed when the event\n\
+     * is fired.\n\
+     * @returns undefined\n\
+     * @api private\n\
+     */\n\
     Postpone.prototype._removeEventListener = function( el, callback ) {\n\
         /** Try to remove the event using `removeEventListener`. */\n\
         try {\n\
