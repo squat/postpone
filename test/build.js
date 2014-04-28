@@ -341,7 +341,7 @@ require.register("postpone/index.js", Function("exports, require, module",
                 if ( this.isVisible( matches[ i ] ) ) {\n\
                     visible.push( matches[ i ] );\n\
                     /** Check if this element is not already postponed. */\n\
-                    if ( !~this.elements.visible.indexOf( matches[ i ] ) ) {\n\
+                    if ( matches[ i ] !== this.elements.visible[ visible.length - 1 ] ) {\n\
                         change = true;\n\
                     }\n\
                 }\n\

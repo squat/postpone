@@ -2,7 +2,7 @@
   "name": "postpone",
   "repo": "lsvx/postpone",
   "description": "A polyfill for postponing the loading of media.",
-  "version": "0.6.2",
+  "version": "0.6.3",
   "keywords": ["postpone", "media", "resource", "priority", "download"],
   "dependencies": {},
   "development": {},

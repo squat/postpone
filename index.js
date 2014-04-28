@@ -139,7 +139,7 @@
                 if ( this.isVisible( matches[ i ] ) ) {
                     visible.push( matches[ i ] );
                     /** Check if this element is not already postponed. */
-                    if ( !~this.elements.visible.indexOf( matches[ i ] ) ) {
+                    if ( matches[ i ] !== this.elements.visible[ visible.length - 1 ] ) {
                         change = true;
                     }
                 }
