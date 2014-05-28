@@ -45,7 +45,6 @@
              */
             this.scrollElements = [];
             this.setThreshold( threshold );
-            this.postpone();
 
             /** Call method to start looking for postponed media. */
             return this.start();
@@ -241,6 +240,11 @@
     Postpone.prototype.start = function() {
         /** Ensure that watching has stopped before starting to watch. */
         if ( this.timeout ) this.stop();
+        /**
+         * Call `postpone` to ensure events are bound and items in view are
+         * loaded.
+         */
+        this.postpone();
         /** Start watching. */
         this.watch();
 

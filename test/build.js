@@ -247,7 +247,6 @@ require.register("postpone/index.js", Function("exports, require, module",
              */\n\
             this.scrollElements = [];\n\
             this.setThreshold( threshold );\n\
-            this.postpone();\n\
 \n\
             /** Call method to start looking for postponed media. */\n\
             return this.start();\n\
@@ -443,6 +442,11 @@ require.register("postpone/index.js", Function("exports, require, module",
     Postpone.prototype.start = function() {\n\
         /** Ensure that watching has stopped before starting to watch. */\n\
         if ( this.timeout ) this.stop();\n\
+        /**\n\
+         * Call `postpone` to ensure events are bound and items in view are\n\
+         * loaded.\n\
+         */\n\
+        this.postpone();\n\
         /** Start watching. */\n\
         this.watch();\n\
 \n\

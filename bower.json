@@ -1,7 +1,7 @@
 {
   "name": "postpone",
   "main": "index.js",
-  "version": "0.6.3",
+  "version": "0.6.4",
   "homepage": "https://github.com/lsvx/postpone",
   "authors": [
     "Lucas Serven <lserven@gmail.com>"
